@@ -515,19 +515,22 @@
         
         
         <div id="total-display">
-            <p>Scan the QR code below</p>
+          
 			<div id="total-price-container">
-				<p>Required Payment Amount of : <span id="total-price"></span>&nbsp;Only.</p>
 				<br>
-			</div>
+				
+				<br>
+		 <p>Please open your GCash app</p><p>and scan the QR code below</p>	
+		 </div>
             <img src="Screenshot_20250127-211841.png" alt="GCash QR Code" style="width:200px; height:250px">
         </div>	    
-    </div>
-	
-<br>
+		</div>
         <div id="alert-message" class="alert-message">
-            <p>Please open your GCash app and scan the QR code.</p>
-        </div><br>
+			<p>Required Payment exact Amount of : <span id="total-price"></span>&nbsp;Only.</p>
+			<p>No transation fee added.</p>
+			<hr>	
+        </div>
+		<br>
 		<button onclick="printReceipt(), window.location.reload();" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(195,34,178,0.7823275862068966) 0%, rgba(45,253,100,1) 100%);border-radius: 5px; margin-bottom:10px;">Proceed</button>
 		<button class="closeBtn" id="closeBtn1" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(195,34,178,0.7823275862068966) 0%, rgba(45,253,100,1) 100%);border-radius: 5px; margin-bottom:10px;">Cancel</button>
 
