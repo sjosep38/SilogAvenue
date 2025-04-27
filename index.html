@@ -253,6 +253,7 @@
 			 <br>
 			<div id="daily-sales" style="color: #2ecc71;">
 			 Total Daily Sales: ₱0.00
+				<button onclick="openFullscreen()">Go Fullscreen</button>
 			</div>
     </div>
     </div>
@@ -605,5 +606,19 @@
             }
         }
     </script>
+	
+
+  <script>
+    function openFullscreen() {
+      const elem = document.documentElement; // Fullscreen the whole page
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) { // Safari
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) { // IE11
+        elem.msRequestFullscreen();
+      }
+    }
+  </script>
 </body>
 </html>
