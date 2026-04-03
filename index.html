@@ -19,11 +19,11 @@
         .nav-btn:hover { background: rgba(255,255,255,0.2); }
 
         .app-container { display: flex; flex: 1; gap: 5px; padding: 10px; box-sizing: border-box; overflow: hidden; }
-        .column { background: white; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; box-sizing: border-box; }
+        .column { background: white; border-radius: px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.5); height: 100%; box-sizing: border-box; }
         
-        .products-panel { flex: 1; border-top: 8px solid var(--primary); border-bottom: 8px solid var(--primary); border-left: 1px solid var(--primary);border-right: 1px solid var(--primary);border-radius:20px; }
-        .cart-panel { flex: 1; border-top: 8px solid var(--accent);  border-bottom: 8px solid var(--accent); border-left: 1px solid var(--accent); border-right: 1px solid var(--accent); border-radius:20px;  }
-        .checkout-panel { flex: .5; border-top: 8px solid var(--edit); border-bottom: 8px solid var(--edit); border-left: 1px solid var(--edit); border-right: 1px solid var(--edit); border-radius:20px;  }
+        .products-panel { flex: 1; border-top: 8px solid var(--primary); border-bottom: 8px solid var(--primary); border-left: 1px solid var(--primary);border-right: 1px solid var(--primary);border-radius:px; }
+        .cart-panel { flex: 1; border-top: 8px solid var(--accent);  border-bottom: 8px solid var(--accent); border-left: 1px solid var(--accent); border-right: 1px solid var(--accent); border-radius:px;  }
+        .checkout-panel { flex: .5; border-top: 8px solid var(--edit); border-bottom: 8px solid var(--edit); border-left: 1px solid var(--edit); border-right: 1px solid var(--edit); border-radius:px;  }
 
         .scroll-list { flex: 1; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; border-radius: 4px; }
         input, select, button { padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
@@ -33,7 +33,7 @@
         
         .btn-complete { background: var(--accent); color: white; width: 100%; font-size: 1rem; cursor: pointer; padding: 10px; font-weight: bold; border: none; margin-top:10px; border-radius: 5px; transition: 0.2s; }
         .btn-complete:hover { background: #219150; }
-        .btn-void { background: #95a5a6; color: white; border:none; width: 100%; cursor:pointer; padding: 5px; margin-top: 5px;}
+        .btn-void { background: red; color: white; border:none; width: 100%; cursor:pointer; padding: 5px; margin-top: 5px;}
 
         .total-display { font-size: 1.5rem; color: var(--danger); font-weight: bold; margin: 10px 0; border-top: 2px solid #eee; padding-top: 10px; text-align: right;}
         
@@ -49,7 +49,6 @@
 		
 		.input-group {
     position: relative;
-    margin-bottom: 20px;
     width: 250px;
 }
 
@@ -91,6 +90,15 @@
 .input-group input:focus {
     border-color: #007bff;
 }
+.total-display {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: RED;
+    border-top: 2px solid #eee;
+    padding-top: 10px;
+    margin-top: 20px;
+}
     </style>
 </head>
 <body>
@@ -107,7 +115,7 @@
     <section class="column products-panel">
         <h3 id="formTitle">Inventory Manager</h3>
         <input type="hidden" id="pId">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
 <div class="input-group">
     <input type="text" id="pBarcode" placeholder=" ">
     <label for="pBarcode">Barcode/SKU</label>
@@ -132,6 +140,7 @@
         <button onclick="resetForm()" id="btnCancel" style="display:none; background: #95a5a6; color:white;">CANCEL</button>
         
         <hr style="width:100%; margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+		Quick Search
         <input type="text" id="pSearch" placeholder="🔍 Search Inventory..." oninput="renderProducts()" style="width: 100%; box-sizing: border-box;">
         <div id="productList" class="scroll-list"></div>
     </section>
@@ -156,7 +165,7 @@
 
     <section class="column checkout-panel">
         <h3>Payment</h3>
-        <div class="total-display">₱<span id="summaryTotal">0.00</span></div>
+        <div class="total-display">TOTAL : ₱<span id="summaryTotal">0.00</span></div>
         
         <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; flex: 1;">
             <label>Payment Method:</label>
@@ -165,7 +174,13 @@
                 <option value="GCash">GCash</option>
                 <option value="Bank Transfer">Bank Transfer</option>
             </select>
-
+			        <button id="discountBtn" onclick="askDiscountPassword()" style="background:#fff; border: 1px solid var(--accent); color: var(--accent); cursor: pointer; padding: 10px; font-weight: bold;width:100%">
+            <i class="fas fa-percents"></i> APPLY 20% DISCOUNT
+        </button>
+      <hr>
+	  		<label>Cash Received:</label>
+            <input type="number" id="cashRendered" placeholder="0.00" style="width:100%; font-size: 1.1rem; align-items: center; padding:5PX; border: 2px solid var(--primary); box-sizing: border-box; text-align: right;" oninput="updateTotals()">
+            
             <div style="display: flex; justify-content: space-between; margin: 5px 0;">
                 <span>Subtotal:</span>
                 <span>₱<span id="summarySubtotal">0.00</span></span>
@@ -175,21 +190,18 @@
                 <span>Discount:</span>
                 <span>-₱<span id="discountLabel">0.00</span></span>
             </div>
-
-            <hr>
-            
-            <label>Cash Received:</label>
-            <input type="number" id="cashRendered" placeholder="0.00" style="width:100%; font-size: 1rem; border: 2px solid var(--primary); box-sizing: border-box; text-align: right;" oninput="updateTotals()">
-            
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 1rem;">
                 <b>Change:</b>
                 <b id="changeDisplay" style="color:var(--accent)">0.00</b>
             </div>
+
         </div>
 
-        <button id="discountBtn" onclick="askDiscountPassword()" style="background:#fff; border: 1px solid var(--accent); color: var(--accent); cursor: pointer; padding: 10px; font-weight: bold;">
-            <i class="fas fa-percents"></i> APPLY 20% DISCOUNT
-        </button>
+      
+            
+
+
+
         <button class="btn-complete" onclick="processTransaction()">
             <i class="fas fa-print"></i> COMPLETE & PRINT
         </button>
@@ -429,6 +441,7 @@ function askDiscountPassword() {
 
 function voidCart() {
     if(cart.length > 0 && confirm("Are you sure you want to clear the entire order?")) {
+	
         cart = [];
         discountApplied = false;
         document.getElementById('discountBtn').innerHTML = '<i class="fas fa-percent"></i> APPLY 20% DISCOUNT';
