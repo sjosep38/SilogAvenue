@@ -167,7 +167,7 @@
         <h3>Payment</h3>
         <div class="total-display">TOTAL : ₱<span id="summaryTotal">0.00</span></div>
         
-        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; flex: 1;">
+        <div style="background: #f9f9f9; padding: 5px; border-radius: 5px; flex: 1;">
             <label>Payment Method:</label>
             <select id="payMethod" style="width: 100%; margin-bottom: 15px;">
                 <option value="Cash">Cash</option>
@@ -250,6 +250,13 @@
 </div>
 
 <script>
+
+window.addEventListener('beforeunload', (event) => {
+  // Cancel the event as stated by the standard.
+  event.preventDefault();
+  // Chrome requires returnValue to be set.
+  event.returnValue = '';
+});
 let db;
 let cart = [];
 let discountApplied = false;
@@ -639,6 +646,18 @@ function exportToCSV() {
         alert("Export failed: " + err.message);
     }
 }
+const elem = document.documentElement;
+
+function openFullscreen() {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) { /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
 </script>
 </body>
 </html>
