@@ -1,624 +1,571 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>POS Silog Avenue</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Kurt POS - Professional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary: #2c3e50; 
+            --accent: #27ae60; 
+            --danger: #e74c3c; 
+            --edit: #f39c12;
+            --bg: #f4f7f6; 
+        }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }        
+        .dashboard-header { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(90deg, #05354a 0%, #274359 100%); padding: 10px 15px; color: #fff; height: 50px; margin:0; }
+        .nav-btn { border:none; background:rgba(255,255,255,0.1); color:#fff; padding: 8px 15px; border-radius: 4px; cursor:pointer; margin-left: 10px; transition: 0.3s; }
+        .nav-btn:hover { background: rgba(255,255,255,0.2); }
+
+        .app-container { display: flex; flex: 1; gap: 10px; padding: 10px; box-sizing: border-box; overflow: hidden; }
+        .column { background: white; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; box-sizing: border-box; }
+        
+        .products-panel { flex: 1; border-top: 5px solid var(--primary); }
+        .cart-panel { flex: 1.2; border-top: 5px solid var(--accent);  }
+        .checkout-panel { flex: .8; border-top: 5px solid var(--edit); }
+
+        .scroll-list { flex: 1; overflow-y: auto; border: 1px solid #eee; margin-top: 10px; border-radius: 4px; }
+        input, select, button { padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+        
+        .product-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f9f9f9; }
+        .btn-action { border: none; color: white; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-left: 3px; }
+        
+        .btn-complete { background: var(--accent); color: white; width: 100%; font-size: 1.1rem; cursor: pointer; padding: 15px; font-weight: bold; border: none; margin-top:10px; border-radius: 5px; transition: 0.2s; }
+        .btn-complete:hover { background: #219150; }
+        .btn-void { background: #95a5a6; color: white; border:none; width: 100%; cursor:pointer; padding: 5px; margin-top: 5px;}
+
+        .total-display { font-size: 1.5rem; color: var(--danger); font-weight: bold; margin: 10px 0; border-top: 2px solid #eee; padding-top: 10px; text-align: right;}
+        
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
+        .modal-content { background: white; margin: 2% auto; padding: 20px; width: 90%; max-width: 850px; max-height: 90vh; overflow-y: auto; border-radius: 8px; }
+
+        #receipt-print { display: none; font-family: 'Courier New', Courier, monospace; width: 58mm; padding: 2mm; color: #000; }
+        @media print {
+            body * { visibility: hidden; }
+            #receipt-print, #receipt-print * { visibility: visible; }
+            #receipt-print { position: absolute; left: 0; top: 0; width: 58mm; display: block !important; }
+        }
+    </style>
 </head>
 <body>
-  <div class="split-container">
-    <div class="left-panel">
-	<div class="scroll-box">
-<h2>- SILOG MENU -</h2>
-            <center>
-			<table>
-                <tr>
-    <td><div class="product" data-product="HAMSILOG" onclick="addProduct('HAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-HAMSILOG">HAMSILOG ₱70</div>
-            <img class="logo" src="SHORT/HAMSILOG.jpg">
-            <div id="sold-out-HAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="TAPSILOG" onclick="addProduct('TAPSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TAPSILOG">TAPSILOG ₱70</div>
-            <img class="logo" src="SHORT/TAPSILOG.jpg">
-           <div id="sold-out-TAPSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="PORKSILOG" onclick="addProduct('PORKSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PORKSILOG">PORKSILOG ₱70</div>
-            <img class="logo" src="SHORT/PORKSILOG.jpg">
-           <div id="sold-out-PORKSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="LONGSILOG" onclick="addProduct('LONGSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-LONGSILOG">LONGSILOG ₱70</div>
-            <img class="logo" src="SHORT/LONGSILOG.jpg">
-           <div id="sold-out-LONGSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	
-	
-    <td><div class="product" data-product="BANGSILOG" onclick="addProduct('BANGSILOG', 70.00)">
-           <div class="sold-out1" id="sold-out1-BANGSILOG">BANGSILOG ₱40</div>
-            <img class="logo" src="SHORT/BANGSILOG.jpg">
-            <div id="sold-out-BANGSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	</tr>
-	
-	<tr>
-    <td><div class="product" data-product="ADOBOSILOG" onclick="addProduct('ADOBOSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-ADOBOSILOG">ADOBOSILOG ₱70</div>
-            <img class="logo" src="SHORT/ADOBOSILOG.jpg">
-			<div id="sold-out-ADOBOSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="BACSILOG" onclick="addProduct('BACSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-BACSILOG">BACSILOG ₱70</div>
-            <img class="logo" src="SHORT/BACSILOG.jpg">
-			<div id="sold-out-BACSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	    <td><div class="product" data-product="SPAMSILOG" onclick="addProduct('SPAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-SPAMSILOG">SPAMBOSILOG ₱70</div>
-            <img class="logo" src="SHORT/SPAMSILOG.jpg">
-			<div id="sold-out-SPAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="HOTSILOG" onclick="addProduct('HOTSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-HOTSILOG">HOTSILOG ₱70</div>
-            <img class="logo" src="SHORT/HOTSILOG.jpg">
-			<div id="sold-out-HOTSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	 <td><div class="product" data-product="TOSILOG" onclick="addProduct('TOSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TOSILOG">TOSILOG ₱70</div>
-            <img class="logo" src="SHORT/TOSILOG.jpg">
-			<div id="sold-out-TOSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-</tr>
-            </table></center>
-			<table>
-			<BR>
-            <h2>- BEVERAGES -</h2>
-            	<tr>
-					<td><div class="product" data-product="COKE"  onclick="addProduct('COKE 330ML', 20.00)">
-					<div class="sold-out1" id="sold-out1-COKE">COKE 330ML ₱20</div>
-						<img class="logo" src="DRINKS/COKE.png">
-						<div id="sold-out-COKE" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('SPRITE 330ML', 18.00)">
-					<div class="sold-out1" id="sold-out1-SPRITE">SPRITE 330ML ₱18</div>
-						<img class="logo" src="DRINKS/SPRITE.jpg">
-						<div id="sold-out-SPRITE" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('M.DEW 355ML', 21.00)">
-					<div class="sold-out1" id="sold-out1-MOUNTAIN DEW">MOUNTAIN DEW 355ML ₱21</div>
-						<img class="logo" src="DRINKS/MOUNTAIN DEW.jpg">
-						<div id="sold-out-MOUNTAIN DEW" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('ROYAL 1L', 35.00)">
-					<div class="sold-out1" id="sold-out1-ROYAL">ROYAL 1L ₱35</div>
-						<img class="logo" src="DRINKS/ROYAL.jpg">
-						<div id="sold-out-ROYAL" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('RC COLA 1L ', 30.00)">
-					<div class="sold-out1" id="sold-out1-RC COLA">RC COLA 1L ₱30</div>
-						<img class="logo" src="DRINKS/RC COLA.png">
-						<div id="sold-out-RC COLA" class="sold-out-message">SOLD OUT</div>
-				</tr>
-				<tr>
-					</div></td>
-					<td><div class="product" onclick="addProduct('PEPSI 330ML', 20.00)">
-					<div class="sold-out1" id="sold-out1-PEPSI COLA">PEPSI COLA 330ML ₱20</div>
-						<img class="logo" src="DRINKS/PEPSI COLA.jpg">
-						<div id="sold-out-PEPSI COLA" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('POP 330ML', 16.00)">
-					<div class="sold-out1" id="sold-out1-POP COLA">POP COLA 300ML ₱16</div>
-						<img class="logo" src="DRINKS/POP COLA.png">
-						<div id="sold-out-POP COLA" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-				</tr>	
-					</tr>
-					<table>
-					<BR>
-					<h2>- SHORT ORDER -</h2>
-                <tr>
-                    <td><div class="product" onclick="addProduct('PCANTON', 300.00)">
-					<div class="sold-out1" id="sold-out1-PANCIT CANTON">PANCIT CANTON Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PANCIT CANTON.jpg">
-						<div id="sold-out-PANCIT CANTON" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('BIKO', 300.00)">
-					<div class="sold-out1" id="sold-out1-BIKO">BIKO Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/BIKO.jpg">
-						<div id="sold-out-BIKO" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('CARBONARA', 300.00)">
-					<div class="sold-out1" id="sold-out1-CARBONARA">CARBONARA Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/CARBONARA.jpg">
-						<div id="sold-out-CARBONARA" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('SPAGETTI', 300.00)">
-					<div class="sold-out1" id="sold-out1-SPAGETTI">SPAGETTI Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/SPAGETTI.jpg">
-						<div id="sold-out-SPAGETTI" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('FRIES', 300.00)">
-					<div class="sold-out1" id="sold-out1-FRIES">FRIES Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/FRIES.jpg">
-						<div id="sold-out-FRIES" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-				</tr>
-					<tr>
-				               
-                    <td><div class="product" onclick="addProduct('LECHON BELLY', 300.00)">
-					<div class="sold-out1" id="sold-out1-LECHON BELLY">LBELLY Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/LBELLY.jpg">
-						<div id="sold-out-LECHON BELLY" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('SUMAN', 300.00)">
-					<div class="sold-out1" id="sold-out1-SUMAN">SUMAN Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/SUMAN.jpg">
-						<div id="sold-out-SUMAN" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					
-					<td><div class="product" onclick="addProduct('BAKEMAC', 300.00)">
-					<div class="sold-out1" id="sold-out1-BAKEMAC">BAKEMAC Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/BAKEMAC.jpg">
-						<div id="sold-out-BAKEMAC" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('PUTO', 300.00)">
-					<div class="sold-out1" id="sold-out1-PUTO">PUTO Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PUTO.jpg">
-						<div id="sold-out-PANCIT CANTON" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('PALABOK', 300.00)">
-					<div class="sold-out1" id="sold-out1-PALABOK">PALABOK Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PALABOK.jpg">
-						<div id="sold-out-PALABOK" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-			</tr>
-					<tr>
-                    <td><div class="product" onclick="addProduct('LSHANGHAI', 300.00)">
-					<div class="sold-out1" id="sold-out1-PANCIT CANTON">LUMPIA SHANGHAI Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/LUMPIA.jpg">
-						<div id="sold-out-LUMPIA SHANGHAI" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
 
-
-    <td><div class="product" data-product="HAMSILOG" onclick="addProduct('HAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PAKBET">HAMSILOG ₱70</div>
-            <img class="logo" src="SILOG/HAMSILOG.jpg">
-            <div id="sold-out-HAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="TAPSILOG" onclick="addProduct('TAPSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TAPSILOG">TAPSILOG ₱70</div>
-            <img class="logo" src="SILOG/TAPSILOG.jpg">
-           <div id="sold-out-TAPSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="PORKSILOG" onclick="addProduct('PORKSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PORKSILOG">PORKSILOG ₱70</div>
-            <img class="logo" src="SILOG/PORKSILOG.jpg">
-           <div id="sold-out-PORKSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-				</tr>
-            </table></center>
-            </table>
+<h3 class="dashboard-header">
+    <span><i class="fas fa-cash-register"></i> SEANSO VLOG POS <small style="font-weight: normal; opacity: 0.8; font-size: 0.7em;">v2.0</small></span>
+    <div>
+        <button class="nav-btn" onclick="toggleModal('inventoryModal')"><i class="fas fa-boxes"></i> Stocks</button>
+        <button class="nav-btn" onclick="toggleModal('salesModal')"><i class="fas fa-file-invoice-dollar"></i> Reports</button>
     </div>
-	</div>
-	
-    <div class="right-panel">
-     
-			
-			<div class="countercart">
-				<div class="column1">
-                <ul id="cart-items"></ul>
-				<!-- Add this element where you want to display the discount amount in the cart -->
-				</div>
-			</div>
-			<div class="counterpayment">PAYMENT
-				<hr>
-				<div id="total-price-container">
-					<p style="color:yellow; font-size: 22px;">Total :<span id="duplicated-total-price" style="color:yellow; font-size: 22px;"></span></p> <!-- New element for duplicated price -->
-				</div><!-- Add this element where you want to display the discount amount in the cart -->
-				<div>
-				<p id="discount-amount" style="color:yellow; font-size: 22px;"></p>
-				</div>
-			</div>
-			
-			<div class="counter">
-				<button onclick="printReceipt(), resetWindow();" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(34,194,195,1) 0%, rgba(253,45,231,1) 100%); border-radius: 5px; margin-bottom:10px;">Pay Now</button>
-				<button onclick="resetWindow(), window.location.reload();" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%); border-radius: 5px; margin-bottom:10px;">Clear Order</button>
-				<button onclick="resetDailySales();" style="height: 40px; width: 123px; background: linear-gradient(0deg, rgba(34,56,195,1) 0%, rgba(45,253,52,1) 100%); border-radius: 5px; margin-bottom:10px;">Reset Sales</button>
-				<button id="discount-button" onclick="applyDiscount()" style="height: 40px; width: 123px; background: linear-gradient(0deg, rgba(194,34,195,1) 0%, rgba(45,70,253,1) 100%);border-radius: 5px; margin-bottom:10px;">Apply Discount</button>
-				<button id="myBtn1" style="height: 40px;  width: 123px; background: linear-gradient(0deg, rgba(195,34,34,1) 0%, rgba(45,253,55,1) 100%); border-radius: 5px; margin-bottom:10px;">GCash Payment</button>
-				<button onclick="print();" style="height: 40px;  width: 123px; background: linear-gradient(0deg, rgba(34,42,195,1) 0%, rgba(253,45,87,1) 100%); border-radius: 5px; margin-bottom:1px;">Print</button>
-				  <!-- <button class="openModalBtn" data-modal="modal8" style="height: 40px;  width: 123px; background: linear-gradient(0deg, rgba(34,42,195,1) 0%, rgba(253,45,87,1) 100%); border-radius: 5px; margin-bottom:1px;">Print</button>-->
-			</div>
-			
-			<div class="counterx"><center>
+</h3>
 
-			</center>
-			</div>
-			<hr><p><center>Your Transaction Number is:</center>
-			 <center><h1 id="transactionNumber"></center></h1>
-			 <br>
-			<div id="daily-sales" style="color: #2ecc71;">
-			 Total Daily Sales: ₱0.00
-				<button onclick="openFullscreen()">Go Fullscreen</button>
-			</div>
+<div class="app-container">
+    <section class="column products-panel">
+        <h3 id="formTitle">Inventory Manager</h3>
+        <input type="hidden" id="pId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <input type="text" id="pBarcode" placeholder="Barcode/SKU">
+            <input type="text" id="pName" placeholder="Item Name">
+            <input type="number" id="pPrice" placeholder="Price">
+            <input type="number" id="pStock" placeholder="Stock Qty">
+        </div>
+        <button onclick="saveProduct()" id="btnSave" style="background: var(--primary); color: white; cursor:pointer;">SAVE PRODUCT</button>
+        <button onclick="resetForm()" id="btnCancel" style="display:none; background: #95a5a6; color:white;">CANCEL</button>
+        
+        <hr style="width:100%; margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+        <input type="text" id="pSearch" placeholder="🔍 Search Inventory..." oninput="renderProducts()" style="width: 100%; box-sizing: border-box;">
+        <div id="productList" class="scroll-list"></div>
+    </section>
+
+    <section class="column cart-panel">
+        <h3>Current Order</h3>
+        <input type="text" id="cartScanner" placeholder="Scan Barcode / Search..." style="width: 100%; background: #fffde7; font-weight: bold; border: 2px solid var(--accent); box-sizing: border-box;" onkeypress="if(event.key==='Enter') addToCart(this.value)">
+        
+        <div style="display: flex; font-size: 11px; font-weight: bold; color: #777; padding: 10px 10px 0;">
+            <span style="flex: 2;">ITEM</span>
+            <span style="flex: 1; text-align: center;">PRICE</span>
+            <span style="flex: 1; text-align: center;">QTY</span>
+            <span style="flex: 1; text-align: right;">TOTAL</span>
+            <span style="width: 30px;"></span>
+        </div>
+        <div id="cartItems" class="scroll-list"></div>
+        <div style="padding: 10px; background: #f8f9fa;">
+            <p style="margin:0">Total Items: <b id="summaryQty">0</b></p>
+            <button class="btn-void" onclick="voidCart()">VOID TRANSACTION</button>
+        </div>
+    </section>
+
+    <section class="column checkout-panel">
+        <h3>Payment</h3>
+        <div class="total-display">₱<span id="summaryTotal">0.00</span></div>
+        
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; flex: 1;">
+            <label>Payment Method:</label>
+            <select id="payMethod" style="width: 100%; margin-bottom: 15px;">
+                <option value="Cash">Cash</option>
+                <option value="GCash">GCash</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+
+            <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                <span>Subtotal:</span>
+                <span>₱<span id="summarySubtotal">0.00</span></span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin: 5px 0; color: var(--danger);">
+                <span>Discount:</span>
+                <span>-₱<span id="discountLabel">0.00</span></span>
+            </div>
+
+            <hr>
+            
+            <label>Cash Received:</label>
+            <input type="number" id="cashRendered" placeholder="0.00" style="width:100%; font-size: 1rem; border: 2px solid var(--primary); box-sizing: border-box; text-align: right;" oninput="updateTotals()">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 1rem;">
+                <b>Change:</b>
+                <b id="changeDisplay" style="color:var(--accent)">0.00</b>
+            </div>
+        </div>
+
+        <button id="discountBtn" onclick="askDiscountPassword()" style="background:#fff; border: 1px solid var(--accent); color: var(--accent); cursor: pointer; padding: 10px; font-weight: bold;">
+            <i class="fas fa-percent"></i> APPLY 20% DISCOUNT
+        </button>
+        <button class="btn-complete" onclick="processTransaction()">
+            <i class="fas fa-print"></i> COMPLETE & PRINT
+        </button>
+    </section>
+</div>
+
+<div id="receipt-print"></div>
+
+<div id="salesModal" class="modal">
+    <div class="modal-content">
+        <button onclick="toggleModal('salesModal')" style="float:right; background:var(--danger); color:white; border:none; padding:5px 10px; cursor:pointer;">Close</button>
+        <h2>Sales History</h2>
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+            <label>Filter View:</label>
+            <select id="salesFilter" onchange="loadSalesHistory()">
+                <option value="daily">Today's Sales</option>
+                <option value="all">All Time History</option>
+            </select>
+<button onclick="exportToCSV()" style="background: var(--accent); color: white; border:none; padding: 10px; cursor:pointer; border-radius:4px;">
+    <i class="fas fa-file-export"></i> EXPORT TO CSV
+</button>
+        </div>
+        <table width="100%" border="1" style="border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="background:#2c3e50; color:white;">
+                    <th style="padding:10px;">Date/Time</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Method</th>
+                </tr>
+            </thead>
+            <tbody id="salesBody"></tbody>
+        </table>
     </div>
+</div>
+
+<div id="inventoryModal" class="modal">
+    <div class="modal-content">
+        <button onclick="toggleModal('inventoryModal')" style="float:right">Close</button>
+        <h2>Current Stock Status</h2>
+        <table width="100%" border="1" style="border-collapse: collapse; margin-top:10px;">
+            <thead><tr style="background:#eee"><th>Barcode</th><th>Item</th><th>Price</th><th>In Stock</th><th>Sold</th></tr></thead>
+            <tbody id="invBody"></tbody>
+        </table>
     </div>
-  <script src="silogavenue.js"></script>
-  
-  <!-- Modal structure -->
-  <div id="myModala" class="modala">
-    <div class="modala-content">
-      <span class="close" id="closeModala">&times;</span>
-<div class="container"><center>
-        <table>
-		             <tr>
-    <td><div class="product" data-product="HAMSILOG" onclick="addProduct('HAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PAKBET">HAMSILOG ₱70</div>
-            <img class="logo" src="SILOG/HAMSILOG.JPG">
-            <div id="sold-out-HAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="TAPSILOG" onclick="addProduct('TAPSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TAPSILOG">TAPSILOG ₱70</div>
-            <img class="logo" src="SILOG/TAPSILOG.JPG">
-           <div id="sold-out-TAPSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="PORKSILOG" onclick="addProduct('PORKSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PORKSILOG">PORKSILOG ₱70</div>
-            <img class="logo" src="SILOG/PORKSILOG.JPG">
-           <div id="sold-out-PORKSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="LONGSILOG" onclick="addProduct('LONGSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-LONGSILOG">LONGSILOG ₱70</div>
-            <img class="logo" src="SILOG/LONGSILOG.JPG">
-           <div id="sold-out-LONGSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	
-	
-    <td><div class="product" data-product="BANGSILOG" onclick="addProduct('BANGSILOG', 70.00)">
-           <div class="sold-out1" id="sold-out1-BANGSILOG">BANGSILOG ₱40</div>
-            <img class="logo" src="SILOG/BANGSILOG.JPG">
-            <div id="sold-out-BANGSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
+</div>
 
-    <td><div class="product" data-product="ADOBOSILOG" onclick="addProduct('ADOBOSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-ADOBOSILOG">ADOBOSILOG ₱70</div>
-            <img class="logo" src="SILOG/ADOBOSILOG.JPG">
-			<div id="sold-out-ADOBOSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="BACSILOG" onclick="addProduct('BACSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-BACSILOG">BACSILOG ₱70</div>
-            <img class="logo" src="SILOG/BACSILOG.JPG">
-			<div id="sold-out-BACSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	<tr>
-	</tr>
-	    <td><div class="product" data-product="SPAMSILOG" onclick="addProduct('SPAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-SPAMSILOG">SPAMBOSILOG ₱70</div>
-            <img class="logo" src="SILOG/SPAMSILOG.JPG">
-			<div id="sold-out-SPAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="HOTSILOG" onclick="addProduct('HOTSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-HOTSILOG">HOTSILOG ₱70</div>
-            <img class="logo" src="SILOG/HOTSILOG.JPG">
-			<div id="sold-out-HOTSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-	 <td><div class="product" data-product="TOSILOG" onclick="addProduct('TOSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TOSILOG">TOSILOG ₱70</div>
-            <img class="logo" src="SILOG/TOSILOG.JPG">
-			<div id="sold-out-TOSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-</tr>
-            	<tr>
-					<td><div class="product" data-product="COKE"  onclick="addProduct('COKE 330ML', 20.00)">
-					<div class="sold-out1" id="sold-out1-COKE">COKE 330ML ₱20</div>
-						<img class="logo" src="DRINKS/COKE.PNG">
-						<div id="sold-out-COKE" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					 <td><div class="product" data-product="SPRITE" onclick="addProduct('SPRITE 330ML', 18.00)">
-					<div class="sold-out1" id="sold-out1-SPRITE">SPRITE 330ML ₱18</div>
-						<img class="logo" src="DRINKS/SPRITE.JPG">
-						<div id="sold-out-SPRITE" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product"   data-product="MOUNTAIN DEW" onclick="addProduct('M.DEW 355ML', 21.00)">
-					<div class="sold-out1" id="sold-out1-MOUNTAIN DEW">MOUNTAIN DEW 355ML ₱21</div>
-						<img class="logo" src="DRINKS/MOUNTAIN DEW.JPG">
-						<div id="sold-out-MOUNTAIN DEW" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product"  data-product="COKE" onclick="addProduct('ROYAL 1L', 35.00)">
-					<div class="sold-out1" id="sold-out1-ROYAL">ROYAL 1L ₱35</div>
-						<img class="logo" src="DRINKS/ROYAL.jpg">
-						<div id="sold-out-ROYAL" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product"  data-product="COKE" onclick="addProduct('RC COLA 1L ', 30.00)">
-					<div class="sold-out1" id="sold-out1-RC COLA">RC COLA 1L ₱30</div>
-						<img class="logo" src="DRINKS/RC COLA.PNG">
-						<div id="sold-out-RC COLA" class="sold-out-message">SOLD OUT</div>
+<script>
+let db;
+let cart = [];
+let discountApplied = false;
+const DISCOUNT_PASS = "1234";
 
-					</div></td>
-					<td><div class="product" onclick="addProduct('PEPSI 330ML', 20.00)">
-					<div class="sold-out1" id="sold-out1-PEPSI COLA">PEPSI COLA 330ML ₱20</div>
-						<img class="logo" src="DRINKS/PEPSI COLA.jpg">
-						<div id="sold-out-PEPSI COLA" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-					<td><div class="product" onclick="addProduct('POP 330ML', 16.00)">
-					<div class="sold-out1" id="sold-out1-POP COLA">POP COLA 300ML ₱16</div>
-						<img class="logo" src="DRINKS/POP COLA.PNG">
-						<div id="sold-out-POP COLA" class="sold-out-message">SOLD OUT</div>
-					</div></td>
-				</tr>
+const request = indexedDB.open("MasterKurtDB", 1);
+request.onupgradeneeded = e => {
+    db = e.target.result;
+    db.createObjectStore("products", { keyPath: "id", autoIncrement: true });
+    db.createObjectStore("sales", { keyPath: "id", autoIncrement: true });
+};
+request.onsuccess = e => { 
+    db = e.target.result; 
+    renderProducts(); 
+    document.getElementById('cartScanner').focus(); // Focus scanner on load
+};
 
-	
-            </table><center>
-			<table>
-                <tr>
-                    <td><div class="product" onclick="addProduct('PANCIT CANTON', 300.00)">
-					<div class="sold-out1" id="sold-out1-PANCIT CANTON">PANCIT CANTON Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PANCIT CANTON.jpg">
-						<div id="sold-out-PANCIT CANTON" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('BIKO', 300.00)">
-					<div class="sold-out1" id="sold-out1-BIKO">BIKO Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/BIKO.jpg">
-						<div id="sold-out-BIKO" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('CARBONARA', 300.00)">
-					<div class="sold-out1" id="sold-out1-CARBONARA">CARBONARA Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/CARBONARA.jpg">
-						<div id="sold-out-CARBONARA" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('SPAGETTI', 300.00)">
-					<div class="sold-out1" id="sold-out1-SPAGETTI">SPAGETTI Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/SPAGETTI.jpg">
-						<div id="sold-out-SPAGETTI" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('FRIES', 300.00)">
-					<div class="sold-out1" id="sold-out1-FRIES">FRIES Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/FRIES.jpg">
-						<div id="sold-out-FRIES" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-				
-				               
-                    <td><div class="product" onclick="addProduct('LECHON BELLY', 300.00)">
-					<div class="sold-out1" id="sold-out1-LECHON BELLY">LBELLY Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/LBELLY.jpg">
-						<div id="sold-out-LECHON BELLY" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('SUMAN', 300.00)">
-					<div class="sold-out1" id="sold-out1-SUMAN">SUMAN Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/SUMAN.jpg">
-						<div id="sold-out-SUMAN" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					</tr>
-					<td><div class="product" onclick="addProduct('BAKEMAC', 300.00)">
-					<div class="sold-out1" id="sold-out1-BAKEMAC">BAKEMAC Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/BAKEMAC.jpg">
-						<div id="sold-out-BAKEMAC" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('PUTO', 300.00)">
-					<div class="sold-out1" id="sold-out1-PUTO">PUTO Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PUTO.jpg">
-						<div id="sold-out-PANCIT CANTON" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-					<td><div class="product" onclick="addProduct('PALABOK', 300.00)">
-					<div class="sold-out1" id="sold-out1-PALABOK">PALABOK Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/PALABOK.jpg">
-						<div id="sold-out-PALABOK" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
-			
-                    <td><div class="product" onclick="addProduct('LUMPIA SHANGHAI', 300.00)">
-					<div class="sold-out1" id="sold-out1-PANCIT CANTON">LUMPIA SHANGHAI Good for 15pax ₱300.00</div>
-                        <img class="logo" src="SHORT/LUMPIA.jpg">
-						<div id="sold-out-LUMPIA SHANGHAI" class="sold-out-message">SOLD OUT</div>
-                    </div></td>
+// --- PRODUCT CRUD ---
+function saveProduct() {
+    const id = document.getElementById('pId').value;
+    const product = {
+        barcode: document.getElementById('pBarcode').value.trim(),
+        name: document.getElementById('pName').value.trim(),
+        price: parseFloat(document.getElementById('pPrice').value || 0),
+        stock: parseInt(document.getElementById('pStock').value || 0)
+    };
+    if(!product.barcode || !product.name) return alert("Fill Name and Barcode");
+    
+    const tx = db.transaction("products", "readwrite");
+    const store = tx.objectStore("products");
+    id ? (product.id = parseInt(id), store.put(product)) : (product.sold = 0, store.add(product));
+    tx.oncomplete = () => { resetForm(); renderProducts(); };
+}
 
+function renderProducts() {
+    const list = document.getElementById('productList');
+    const search = document.getElementById('pSearch').value.toLowerCase();
+    list.innerHTML = "";
+    db.transaction("products").objectStore("products").openCursor().onsuccess = e => {
+        const cursor = e.target.result;
+        if(cursor) {
+            const v = cursor.value;
+            if(v.name.toLowerCase().includes(search) || v.barcode.includes(search)) {
+                const stockColor = v.stock <= 5 ? 'color:red; font-weight:bold' : '';
+                list.innerHTML += `
+                <div class="product-item">
+                    <div onclick="addToCart('${v.barcode}')" style="cursor:pointer; flex:1">
+                        <b>${v.name}</b><br>
+                        <small>₱${v.price.toFixed(2)} | <span style="${stockColor}">Stock: ${v.stock}</span></small>
+                    </div>
+                    <div>
+                        <button class="btn-action" style="background:var(--edit)" onclick="editProduct(${v.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action" style="background:var(--danger)" onclick="deleteProduct(${v.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }
+            cursor.continue();
+        }
+    };
+}
 
-    <td><div class="product" data-product="HAMSILOG" onclick="addProduct('HAMSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PAKBET">HAMSILOG ₱70</div>
-            <img class="logo" src="SILOG/HAMSILOG.JPG">
-            <div id="sold-out-HAMSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="TAPSILOG" onclick="addProduct('TAPSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-TAPSILOG">TAPSILOG ₱70</div>
-            <img class="logo" src="SILOG/TAPSILOG.JPG">
-           <div id="sold-out-TAPSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-    <td><div class="product" data-product="PORKSILOG" onclick="addProduct('PORKSILOG', 70.00)">
-            <div class="sold-out1" id="sold-out1-PORKSILOG">PORKSILOG ₱70</div>
-            <img class="logo" src="SILOG/PORKSILOG.JPG">
-           <div id="sold-out-PORKSILOG" class="sold-out-message">SOLD OUT</div>
-        </div>
-    </td>
-				</tr>
-            </table></center>
-        </div>
-    </div>
-  </div>
-  <script>
-   let inactivityTimer;
-    const modala = document.getElementById("myModala");
-    const closeModala = document.getElementById("closeModala");
+function editProduct(id) {
+    db.transaction("products").objectStore("products").get(id).onsuccess = e => {
+        const p = e.target.result;
+        document.getElementById('pId').value = p.id;
+        document.getElementById('pBarcode').value = p.barcode;
+        document.getElementById('pName').value = p.name;
+        document.getElementById('pPrice').value = p.price;
+        document.getElementById('pStock').value = p.stock;
+        document.getElementById('btnCancel').style.display = "block";
+        document.getElementById('formTitle').innerText = "Edit Product";
+    };
+}
 
-    // Function to show the modal
-    function showModala() {
-      modala.style.display = "block";
+function resetForm() {
+    ['pId','pBarcode','pName','pPrice','pStock'].forEach(i => document.getElementById(i).value = "");
+    document.getElementById('btnCancel').style.display = "none";
+    document.getElementById('formTitle').innerText = "Inventory Manager";
+}
+
+function deleteProduct(id) {
+    if(confirm("Delete item forever?")) {
+        const tx = db.transaction("products", "readwrite");
+        tx.objectStore("products").delete(id);
+        tx.oncomplete = () => renderProducts();
     }
+}
 
-    // Function to hide the modal
-    function hideModala() {
-      modala.style.display = "none";
+// --- CART LOGIC ---
+function addToCart(bc) {
+    if(!bc) return;
+    const tx = db.transaction("products", "readonly");
+    const store = tx.objectStore("products");
+    let found = false;
+
+    store.openCursor().onsuccess = e => {
+        const cursor = e.target.result;
+        if(cursor) {
+            if(cursor.value.barcode === bc) {
+                found = true;
+                const p = cursor.value;
+                if(p.stock <= 0) return alert("Error: Item is out of stock!");
+                
+                const itemInCart = cart.find(i => i.barcode === bc);
+                if(itemInCart) {
+                    if(itemInCart.qty + 1 > p.stock) return alert("Insufficient stock available!");
+                    itemInCart.qty++;
+                } else {
+                    cart.push({...p, qty: 1});
+                }
+                renderCart();
+                document.getElementById('cartScanner').value = "";
+                document.getElementById('cartScanner').focus();
+                return;
+            }
+            cursor.continue();
+        } else if (!found) {
+            alert("Item not found in inventory!");
+            document.getElementById('cartScanner').value = "";
+        }
+    };
+}
+
+function renderCart() {
+    const cont = document.getElementById('cartItems');
+    cont.innerHTML = cart.map((item, idx) => `
+        <div class="product-item">
+            <span style="flex:2"><b>${item.name}</b></span>
+            <span style="flex:1; text-align:center">₱${item.price}</span>
+            <input type="number" value="${item.qty}" style="width:45px" onchange="updateCartQty(${idx}, this.value)">
+            <span style="flex:1; text-align:right">₱${(item.price * item.qty).toFixed(2)}</span>
+            <button onclick="cart.splice(${idx},1); renderCart()" style="background:none; border:none; color:red; cursor:pointer; font-size:1.2rem">×</button>
+        </div>
+    `).join('');
+    updateTotals();
+}
+
+function updateCartQty(idx, qty) {
+    qty = parseInt(qty);
+    if(qty > 0) {
+        // Simple stock check on manual input
+        db.transaction("products").objectStore("products").get(cart[idx].id).onsuccess = e => {
+            if(qty > e.target.result.stock) {
+                alert("Only " + e.target.result.stock + " items in stock!");
+                cart[idx].qty = e.target.result.stock;
+            } else {
+                cart[idx].qty = qty;
+            }
+            renderCart();
+        };
     }
+}
 
-    // Reset the inactivity timer when there's activity
-    function resetTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(showModala, 30000); // 1 minute inactivity
+function updateTotals() {
+    const sub = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+    const discAmount = discountApplied ? (sub * 0.20) : 0;
+    const total = sub - discAmount;
+    const cash = parseFloat(document.getElementById('cashRendered').value || 0);
+
+    document.getElementById('summaryQty').innerText = cart.reduce((sum, i) => sum + i.qty, 0);
+    document.getElementById('summarySubtotal').innerText = sub.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('discountLabel').innerText = discAmount.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('summaryTotal').innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
+    
+    const change = cash - total;
+    const changeEl = document.getElementById('changeDisplay');
+    changeEl.innerText = change >= 0 ? change.toFixed(2) : "0.00";
+    changeEl.style.color = change >= 0 ? "var(--accent)" : "var(--danger)";
+}
+
+function askDiscountPassword() {
+    if (discountApplied) {
+        if (confirm("Remove 20% discount?")) {
+            discountApplied = false;
+            document.getElementById('discountBtn').innerHTML = '<i class="fas fa-percent"></i> APPLY 20% DISCOUNT';
+            updateTotals();
+        }
+        return;
     }
-
-    // Close the modal when the close button is clicked
-    closeModala.onclick = function() {
-      hideModala();
+    const pass = prompt("Enter Manager PIN to apply discount:");
+    if (pass === DISCOUNT_PASS) {
+        discountApplied = true;
+        document.getElementById('discountBtn').innerHTML = '<i class="fas fa-check-circle"></i> DISCOUNT APPLIED';
+        updateTotals();
+    } else if (pass !== null) {
+        alert("Invalid PIN!");
     }
+}
 
-    // Hide the modal when the mouse moves
-    window.addEventListener("mousemove", function() {
-      if (modala.style.display === "block") {
-        hideModala(); // Close modal on mouse movement
-      }
+function voidCart() {
+    if(cart.length > 0 && confirm("Are you sure you want to clear the entire order?")) {
+        cart = [];
+        discountApplied = false;
+        document.getElementById('discountBtn').innerHTML = '<i class="fas fa-percent"></i> APPLY 20% DISCOUNT';
+        document.getElementById('cashRendered').value = "";
+        renderCart();
+    }
+}
+
+// --- TRANSACTION ---
+function processTransaction() {
+    if(!cart.length) return alert("Cart is empty");
+    
+    const sub = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+    const disc = discountApplied ? (sub * 0.20) : 0;
+    const total = sub - disc;
+    const cash = parseFloat(document.getElementById('cashRendered').value || 0);
+
+    if(cash < total) return alert("Insufficient Cash Received!");
+
+    const sale = { 
+        timestamp: Date.now(), 
+        items: [...cart], 
+        subtotal: sub,
+        total, 
+        discount: disc, 
+        cash, 
+        change: cash - total,
+        method: document.getElementById('payMethod').value 
+    };
+
+    const tx = db.transaction(["sales", "products"], "readwrite");
+    tx.objectStore("sales").add(sale);
+    const pStore = tx.objectStore("products");
+
+    cart.forEach(item => {
+        pStore.get(item.id).onsuccess = e => {
+            const p = e.target.result;
+            if(p) {
+                p.stock -= item.qty; 
+                p.sold = (p.sold || 0) + item.qty;
+                pStore.put(p);
+            }
+        };
     });
 
-    // Listen for user interactions (mouse movements or keypresses)
-    window.addEventListener("mousemove", resetTimer);
-    window.addEventListener("keydown", resetTimer);
+    tx.oncomplete = () => {
+        printReceipt(sale);
+        cart = [];
+        discountApplied = false;
+        document.getElementById('discountBtn').innerHTML = '<i class="fas fa-percent"></i> APPLY 20% DISCOUNT';
+        renderCart();
+        renderProducts();
+        document.getElementById('cashRendered').value = "";
+        document.getElementById('cartScanner').focus();
+    };
+}
 
-    // Start the timer on page load
-    resetTimer();
-	</script>
-	
-	 
-
-    <!-- Buttons to open modals -->
-    <button id="myBtn2" style="display:none" >Open Modal 2</button>
-    <button id="myBtn3" style="display:none">Open Modal 3</button>
-    
-
-    <!-- The Modal 1 -->
-    <div id="myModal1" class="modal">
-        <div class="modal-content">
-		      
-    <h2>Send Money using GCash</h2>
-    <div class="container">
-        
-        
-        <div id="total-display">
-          
-			<div id="total-price-container">
-				<br>
-				
-				<br>
-		 <p>Please open your GCash app</p><p>and scan the QR code below</p>	
-		 </div>
-            <img src="Screenshot_20250127-211841.png" alt="GCash QR Code" style="width:200px; height:250px">
-        </div>	    
-		</div>
-        <div id="alert-message" class="alert-message">
-			<p>Required Payment exact Amount of : <span id="total-price"></span>&nbsp;Only.</p>
-			<p>No transaction fee added.</p>
-			<hr>	
+function printReceipt(s) {
+    const div = document.getElementById('receipt-print');
+    div.innerHTML = `
+        <div style="text-align:center; text-transform: uppercase;">
+            <strong>Master Kurt Retail</strong><br>
+            <small>Branch #001 - Metro Manila</small><br>
+            <small>TIN: 123-456-789-000</small>
         </div>
-		<br>
-		<button onclick="printReceipt(), window.location.reload();" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(195,34,178,0.7823275862068966) 0%, rgba(45,253,100,1) 100%);border-radius: 5px; margin-bottom:10px;">Proceed</button>
-		<button class="closeBtn" id="closeBtn1" style="height: 40px; width: 123px;background: linear-gradient(0deg, rgba(195,34,178,0.7823275862068966) 0%, rgba(45,253,100,1) 100%);border-radius: 5px; margin-bottom:10px;">Cancel</button>
-
-    </div>
+        <hr>
+        <div style="text-align:center; font-size:10px; margin-bottom:10px;">
+            Date: ${new Date(s.timestamp).toLocaleString()}
         </div>
- 
-
-    <!-- The Modal 2 -->
-    <div id="myModal2" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeBtn2">&times;</span>
-            <h2>Modal 2</h2>
-            <p>This is the content of Modal 2.</p>
+        ${s.items.map(i => `
+            <div style="margin-bottom: 5px;">
+                ${i.name}<br>
+                <small>${i.qty} x ${i.price.toFixed(2)}</small>
+                <span style="float:right">₱${(i.qty*i.price).toFixed(2)}</span>
+            </div>
+        `).join('')}
+        <hr>
+        <div>Subtotal: <span style="float:right">₱${s.subtotal.toFixed(2)}</span></div>
+        ${s.discount > 0 ? `<div>Discount: <span style="float:right">-₱${s.discount.toFixed(2)}</span></div>` : ''}
+        <div style="margin-top: 5px;">Payment (${s.method}): <span style="float:right">₱${s.cash.toFixed(2)}</span></div>
+        <div>Change: <span style="float:right">₱${s.change.toFixed(2)}</span></div>
+		<div style="font-size: 1.2em;"><strong>TOTAL: <span style="float:right">₱${s.total.toFixed(2)}</span></strong></div>
+        <hr>
+        <div style="text-align:center; font-size: 0.8em; margin-top: 10px;">
+            Thank you for shopping!<br>Please come again.
         </div>
-    </div>
+    `;
+    window.print();
+}
 
-    <!-- The Modal 3 -->
-    <div id="myModal3" class="modal">
-        <div class="modal-content">
-            <span class="close" id="closeBtn3">&times;</span>
-            <h2>Modal 3</h2>
-            <p>This is the content of Modal 3.</p>
-        </div>
-    </div>
-
-    <script>
-        // Get the modal elements
-        var modal1 = document.getElementById("myModal1");
-        var modal2 = document.getElementById("myModal2");
-        var modal3 = document.getElementById("myModal3");
-
-        // Get the buttons that open the modals
-        var btn1 = document.getElementById("myBtn1");
-        var btn2 = document.getElementById("myBtn2");
-        var btn3 = document.getElementById("myBtn3");
-
-        // Get the <span> elements to close the modals
-        var closeBtn1 = document.getElementById("closeBtn1");
-        var closeBtn2 = document.getElementById("closeBtn2");
-        var closeBtn3 = document.getElementById("closeBtn3");
-
-        // When the user clicks the button, open the respective modal
-        btn1.onclick = function() {
-            modal1.style.display = "block";
-        }
-        btn2.onclick = function() {
-            modal2.style.display = "block";
-        }
-        btn3.onclick = function() {
-            modal3.style.display = "none";
-        }
-
-        // When the user clicks on <span> (x), close the respective modal
-        closeBtn1.onclick = function() {
-            modal1.style.display = "none";
-        }
-        closeBtn2.onclick = function() {
-            modal2.style.display = "none";
-        }
-        closeBtn3.onclick = function() {
-            modal3.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal1) {
-                modal1.style.display = "none";
-            } else if (event.target == modal2) {
-                modal2.style.display = "none";
-            } else if (event.target == modal3) {
-                modal3.style.display = "none";
-            }
-        }
-    </script>
-	
-
-  <script>
-    function openFullscreen() {
-      const elem = document.documentElement; // Fullscreen the whole page
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) { // Safari
-        elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) { // IE11
-        elem.msRequestFullscreen();
-      }
+function toggleModal(id) {
+    const m = document.getElementById(id);
+    m.style.display = (m.style.display === "block") ? "none" : "block";
+    if(id === 'salesModal') loadSalesHistory();
+    if(id === 'inventoryModal') {
+        db.transaction("products").objectStore("products").getAll().onsuccess = e => {
+            document.getElementById('invBody').innerHTML = e.target.result.map(v => 
+                `<tr>
+                    <td style="padding:5px;">${v.barcode}</td>
+                    <td>${v.name}</td>
+                    <td>₱${v.price.toFixed(2)}</td>
+                    <td style="color:${v.stock < 10 ? 'red' : 'black'}">${v.stock}</td>
+                    <td>${v.sold || 0}</td>
+                </tr>`
+            ).join('');
+        };
     }
-  </script>
+}
+
+function loadSalesHistory() {
+    const filter = document.getElementById('salesFilter').value;
+    const tbody = document.getElementById('salesBody');
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    
+    db.transaction("sales").objectStore("sales").getAll().onsuccess = e => {
+        const allSales = e.target.result;
+        const filtered = allSales.filter(s => {
+            if (filter === 'daily') return s.timestamp >= startOfDay;
+            return true;
+        }).sort((a, b) => b.timestamp - a.timestamp);
+
+        tbody.innerHTML = filtered.map(s => `
+            <tr>
+                <td style="padding:8px;">${new Date(s.timestamp).toLocaleString()}</td>
+                <td>${s.items.length} items</td>
+                <td>₱${s.total.toFixed(2)}</td>
+                <td>${s.method}</td>
+            </tr>
+        `).join('');
+    };
+}
+function exportToCSV() {
+    // Check if DB is actually ready
+    if (!db) {
+        alert("Database not ready. Please refresh the page.");
+        return;
+    }
+
+    try {
+        const tx = db.transaction("sales", "readonly");
+        const store = tx.objectStore("sales");
+        const request = store.getAll();
+
+        request.onsuccess = e => {
+            const sales = e.target.result;
+            if (!sales || sales.length === 0) {
+                alert("No sales data found to export.");
+                return;
+            }
+
+            // Define Headers - added Subtotal and Tax/Discount fields
+            let csv = "\uFEFF"; // Byte Order Mark (BOM) helps Excel read UTF-8 (symbols like ₱)
+            csv += "Transaction ID,Date,Items Count,Subtotal,Discount,Total,Method,Details\n";
+
+            sales.forEach(s => {
+                const date = new Date(s.timestamp).toLocaleString().replace(/,/g, "");
+                const id = s.id || "N/A";
+                const itemsCount = s.items ? s.items.length : 0;
+                const sub = s.subtotal ? s.subtotal.toFixed(2) : (s.total + (s.discount || 0)).toFixed(2);
+                const disc = (s.discount || 0).toFixed(2);
+                const total = s.total.toFixed(2);
+                const method = s.method || "Cash";
+                
+                // Details: Clean item names of quotes or commas that break CSV
+                const details = s.items ? s.items.map(i => {
+                    let cleanName = i.name.replace(/,/g, "").replace(/"/g, "'");
+                    return `${cleanName}(x${i.qty})`;
+                }).join(" | ") : "";
+
+                csv += `${id},${date},${itemsCount},${sub},${disc},${total},${method},"${details}"\n`;
+            });
+
+            // Trigger Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            
+            a.href = url;
+            a.download = `Sales_Export_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        };
+
+        request.onerror = () => alert("Error accessing sales store.");
+
+    } catch (err) {
+        console.error(err);
+        alert("Export failed: " + err.message);
+    }
+}
+</script>
 </body>
 </html>
